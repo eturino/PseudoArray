@@ -205,7 +205,7 @@ class EtuDev_PseudoArray_Factory {
 			}
 		}
 
-		$info['properties']        = (array) $auxlevels[EtuDev_PseudoArray_Object::LEVEL_ALL];
+		$info['properties']        = (array) @$auxlevels[EtuDev_PseudoArray_Object::LEVEL_ALL];
 		$info['levels']            = (array) $auxlevels;
 		$info['aliases_different'] = (array) $aliases;
 
