@@ -249,6 +249,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	 *
 	 * @uses __set()
 	 * @throws Exception
+	 * @return bool
 	 */
 	public function setValuesFromOriginalData($originalData) {
 
@@ -264,7 +265,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 					if ($this->_aliases_different) {
 						$a = array();
 						foreach ($originalData as $k => $v) {
-							$a[@$this->_aliases[$k] ? : $k] = $v;
+							$a[@$this->_aliases[$k] ?: $k] = $v;
 						}
 						$originalData = $a;
 					}
@@ -296,7 +297,10 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 				throw new Exception("non Traversable data (nor trav. object nor array)");
 			}
 
+			return true;
 		}
+
+		return false;
 	}
 
 	/**
@@ -322,7 +326,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 					if ($this->_aliases_different) {
 						$a = array();
 						foreach ($originalData as $k => $v) {
-							$a[@$this->_aliases[$k] ? : $k] = $v;
+							$a[@$this->_aliases[$k] ?: $k] = $v;
 						}
 						$originalData = $a;
 					}
@@ -368,7 +372,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 					if ($this->_aliases_different) {
 						$a = array();
 						foreach ($originalData as $k => $v) {
-							$a[@$this->_aliases[$k] ? : $k] = $v;
+							$a[@$this->_aliases[$k] ?: $k] = $v;
 						}
 						$originalData = $a;
 					}
@@ -444,7 +448,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	 * @return bool
 	 */
 	public function __isset($key) {
-		$k = @$this->_aliases[$key] ? : $key;
+		$k = @$this->_aliases[$key] ?: $key;
 		return array_key_exists($k, $this->_data);
 	}
 
@@ -461,7 +465,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	}
 
 	public function _unset($key) {
-		$k = @$this->_aliases[$key] ? : $key;
+		$k = @$this->_aliases[$key] ?: $key;
 		unset($this->_data[$k]);
 	}
 
@@ -493,7 +497,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	//magic
 
 	final public function getDefinedAlias($key) {
-		return @$this->_aliases[$key] ? : $key;
+		return @$this->_aliases[$key] ?: $key;
 	}
 
 	/**
@@ -542,7 +546,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 			return $this->$setter($value);
 		}
 
-		$key                    = @$this->_aliases[$atkey] ? : $atkey; //por si no está definido ya
+		$key                    = @$this->_aliases[$atkey] ?: $atkey; //por si no está definido ya
 		$this->_data[$key]      = $value;
 		$this->_aliases[$atkey] = $key; //por si fuera necesario almacenarlo (mejor directamente que mirar a ver si ya está)
 		return true;
@@ -622,7 +626,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 			reset($this->_data);
 			$this->_aliases[$newKey] = $newKey;
 		} else {
-			$k                    = @$this->_aliases[$key] ? : $key;
+			$k                    = @$this->_aliases[$key] ?: $key;
 			$this->_data[$k]      = $value;
 			$this->_aliases[$key] = $k;
 		}
@@ -676,7 +680,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	 */
 	public function toArray($level = null, $toArrayPseudoArrays = true) {
 		if (is_null($level)) {
-			$level = static::TO_ARRAY_LEVEL_DEFAULT ? : self::LEVEL_ALL;
+			$level = static::TO_ARRAY_LEVEL_DEFAULT ?: self::LEVEL_ALL;
 		}
 
 		if ($level == self::LEVEL_ALL) {

@@ -164,7 +164,7 @@ class EtuDev_PseudoArray_Factory {
 				//con tipo
 				if (preg_match('/@property[\s\t]+[a-zA-Z_]+[\s\t]+[\$][a-zA-Z_0-9]+/', $line, $matches)) {
 					foreach ($matches as $key => $m) {
-						$at                                                    = preg_replace('/^@[\t\sa-zA-Z_0-9]+\$/', '', $m);
+						$at                                                   = preg_replace('/^@[\t\sa-zA-Z_0-9]+\$/', '', $m);
 						$ats_by_level[EtuDev_PseudoArray_Object::LEVEL_ALL][] = $at;
 						if ($active_levels) {
 							foreach ($active_levels as $al) {
