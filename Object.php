@@ -25,7 +25,7 @@
  * @author eturino
  * @version 5.0 (April 2012) (menos funcionalidad pero mucha más velocidad. Ya no se permiten properties de instancia ni estáticas)
  */
-class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterator, Countable, EtuDev_Interfaces_PreparedForCache, EtuDev_Interfaces_ToArrayAble {
+class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterator, Countable, EtuDev_Interfaces_PreparedForCache, EtuDev_Interfaces_ToArrayAbleFull {
 
 	const LEVEL_ALL              = '';
 	const TO_ARRAY_LEVEL_DEFAULT = self::LEVEL_ALL;
@@ -669,6 +669,12 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 		}
 	}
 
+	/**
+	 * @return array
+	 */
+	public function toArrayFull() {
+		return $this->toArray(null, true);
+	}
 
 	/**
 	 * returns an actual array with the same elements the iterator can access
