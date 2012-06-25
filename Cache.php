@@ -36,7 +36,7 @@ class EtuDev_PseudoArray_Cache {
 
 	protected function getPrefix() {
 		if (!$this->prefix) {
-			$this->prefix = 'psa';
+			$this->prefix = 'psa' . (defined('APPLICATION_HASHKEY') ? APPLICATION_HASHKEY : '');
 		}
 		return $this->prefix;
 	}
