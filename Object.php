@@ -708,8 +708,8 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 			if (!$reals) {
 				return array();
 			}
-		} else { //si filtramos por level, tenemos que dar solo los del level? (en principio si)
-			$reals = @$this->_properties_by_level[$level];
+		} else { //si filtramos por level, tenemos que dar solo los del level? (en principio si) => si no existe ese level, entonces las del level all (por que? por si estamos haciendo un toArray() y este es un nivel encadenado, si no está definido el nivel es como pedir todos!!!)
+			$reals = @$this->_properties_by_level[$level] ? : (array_key_exists($level, $this->_properties_by_level) ? array() : @$this->_properties_by_level[self::LEVEL_ALL]);
 		}
 		if (!$reals) {
 			return array();
