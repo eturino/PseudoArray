@@ -21,7 +21,7 @@
  * Acepta diferentes propertylevels usando el tag "@propertylevel" y una lista de nombres separados por comas (sin espacios), si esta vacia se asume todos los niveles, que es la opción por defecto
  * Acepta diferentes propertyalias, diferentes nombres en los que la misma propiedad puede ser accedida y establecida la misma propiedad, usando el tag "@ propertyalias aliasName realAttributeName" (sin el espacio entre @ y propertyalias)
  *
- * Acepta etiqueta especial @propertyignored que se usa para indicar que la property con la etiqueta debe ser ignorada a la hora de hacer un toArray()
+ * Acepta tag especial "@ propertyignored property" (sin el espacio entre @ y propertyalias) que se usa para indicar que la property con la etiqueta debe ser ignorada a la hora de hacer un toArray()
  *
  * @author eturino
  * @version 5.0 (April 2012) (menos funcionalidad pero mucha más velocidad. Ya no se permiten properties de instancia ni estáticas)

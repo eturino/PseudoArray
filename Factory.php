@@ -24,11 +24,11 @@ class EtuDev_PseudoArray_Factory {
 		}
 
 		//load from cache
-		$info = EtuDev_PseudoArray_Cache::getInstance()->get($class);
-		if ($info) {
-			static::$info[$class] = $info;
-			return $info;
-		}
+//		$info = EtuDev_PseudoArray_Cache::getInstance()->get($class);
+//		if ($info) {
+//			static::$info[$class] = $info;
+//			return $info;
+//		}
 
 		$info = static::loadInfo($class);
 		if ($info) {
@@ -136,7 +136,6 @@ class EtuDev_PseudoArray_Factory {
 		$forall        = array();
 
 		$ats_by_level = array(EtuDev_PseudoArray_Object::LEVEL_ALL);
-
 		foreach ($lines as $line) {
 			// check new active level
 			if (preg_match('/@propertieslevel[\s\t]+[a-zA-Z_0-9,]+/', $line, $matches)) {
@@ -156,15 +155,17 @@ class EtuDev_PseudoArray_Factory {
 				if (preg_match('/@propertyalias[\s\t]+[a-zA-Z_0-9]+[\s\t]+[a-zA-Z_0-9]+/', $line, $matches)) {
 					foreach ($matches as $key => $m) {
 						$res              = trim(str_replace('@propertyalias', '', $m));
+						$res              = str_replace('$', '', $res);
 						$res              = preg_replace('/[\s\t]+/', ' ', $res);
 						$res              = explode(' ', $res);
 						$aliases[$res[0]] = $res[1];
 					}
 				}
 				// check attribute
-				if (preg_match('/@propertyignored[\s\t]+[a-zA-Z_0-9]/', $line, $matches)) {
+				if (preg_match('/@propertyignored[\s\t]+[a-zA-Z_0-9]+/', $line, $matches)) {
 					foreach ($matches as $key => $m) {
 						$res        = trim(str_replace('@propertyignored', '', $m));
+						$res        = str_replace('$', '', $res);
 						$res        = preg_replace('/[\s\t]+/', ' ', $res);
 						$res        = explode(' ', $res);
 						$toIgnore[] = $res[0];
