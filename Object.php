@@ -21,6 +21,7 @@
  * Acepta diferentes propertylevels usando el tag "@propertylevel" y una lista de nombres separados por comas (sin espacios), si esta vacia se asume todos los niveles, que es la opción por defecto
  * Acepta diferentes propertyalias, diferentes nombres en los que la misma propiedad puede ser accedida y establecida la misma propiedad, usando el tag "@ propertyalias aliasName realAttributeName" (sin el espacio entre @ y propertyalias)
  *
+ * Acepta etiqueta especial @propertyignored que se usa para indicar que la property con la etiqueta debe ser ignorada a la hora de hacer un toArray()
  *
  * @author eturino
  * @version 5.0 (April 2012) (menos funcionalidad pero mucha más velocidad. Ya no se permiten properties de instancia ni estáticas)
@@ -69,6 +70,11 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 
 	/** @var array precalculated properties */
 	protected $_properties_by_level = array();
+
+	/**
+	 * @var array
+	 */
+	protected $_ignore_to_array = array();
 
 	/**
 	 * flag activo
@@ -138,6 +144,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 		$this->_getters             = $info['getters'];
 		$this->_setters             = $info['setters'];
 		$this->_properties_by_level = $info['levels'];
+		$this->_ignore_to_array     = $info['ignore_to_array'];
 	}
 
 	protected function _readyBeforeUse() {
@@ -153,6 +160,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 		$this->_getters             = array();
 		$this->_setters             = array();
 		$this->_properties_by_level = array();
+		$this->_ignore_to_array     = array();
 	}
 
 	/**
@@ -706,9 +714,11 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 			$st = array_merge($st, $this->_data);
 		}
 
+		$st = array_diff_key($st, array_flip($this->_ignore_to_array));
+
 		//getters
 		foreach ($this->_getters as $k => $getter) {
-			if (array_key_exists($k, $st)) {
+			if (array_key_exists($k, $st) && !in_array($k, $this->_ignore_to_array)) {
 				$st[$k] = $this->_getByGetter($getter);
 			}
 		}

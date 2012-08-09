@@ -132,6 +132,7 @@ class EtuDev_PseudoArray_Factory {
 
 		$active_levels = array();
 		$aliases       = array();
+		$toIgnore      = array();
 		$forall        = array();
 
 		$ats_by_level = array(EtuDev_PseudoArray_Object::LEVEL_ALL);
@@ -158,6 +159,15 @@ class EtuDev_PseudoArray_Factory {
 						$res              = preg_replace('/[\s\t]+/', ' ', $res);
 						$res              = explode(' ', $res);
 						$aliases[$res[0]] = $res[1];
+					}
+				}
+				// check attribute
+				if (preg_match('/@propertyignored[\s\t]+[a-zA-Z_0-9]/', $line, $matches)) {
+					foreach ($matches as $key => $m) {
+						$res        = trim(str_replace('@propertyignored', '', $m));
+						$res        = preg_replace('/[\s\t]+/', ' ', $res);
+						$res        = explode(' ', $res);
+						$toIgnore[] = $res[0];
 					}
 				}
 
@@ -208,6 +218,7 @@ class EtuDev_PseudoArray_Factory {
 		$info['properties']        = (array) @$auxlevels[EtuDev_PseudoArray_Object::LEVEL_ALL];
 		$info['levels']            = (array) $auxlevels;
 		$info['aliases_different'] = (array) $aliases;
+		$info['ignore_to_array']   = (array) $toIgnore;
 
 		return $info;
 	}
