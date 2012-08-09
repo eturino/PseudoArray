@@ -106,12 +106,11 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	 * si se pasa colección de datos originales, se agregan al objeto
 	 *
 	 * @param array|Traversable $originalData
-	 * @param int               $propertiesFlag properties Flag to be setted before doing anything else
 	 *
 	 * @uses setValuesFromOriginalData()
 	 * @throws Exception
 	 */
-	public function __construct($originalData = null, $propertiesFlag = null) {
+	public function __construct($originalData = null) {
 		$this->_loadClassInfo();
 
 		$this->_readyBeforeUse();
@@ -217,6 +216,11 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 		}
 	}
 
+	public function setValuesFromOriginalDataIgnoreChecks($originalData) {
+		return $this->doSetValuesFromOriginalData($originalData, true);
+	}
+
+
 	/**
 	 * foreach element in the originalData, we call $this->$k = $v
 	 *
@@ -227,6 +231,19 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	 * @return bool
 	 */
 	public function setValuesFromOriginalData($originalData) {
+		return $this->doSetValuesFromOriginalData($originalData, false);
+	}
+
+	/**
+	 * foreach element in the originalData, we call $this->$k = $v
+	 *
+	 * @param array|Traversable $originalData
+	 *
+	 * @uses __set()
+	 * @throws Exception
+	 * @return bool
+	 */
+	protected function doSetValuesFromOriginalData($originalData, $ignoreChecks = false) {
 
 		if ($originalData) {
 			try {
@@ -246,17 +263,26 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 						$originalData = $a;
 					}
 
-					if (!$this->_allow_not_defined) {
+					if (!$ignoreChecks && !$this->_allow_not_defined) {
 						$originalData = array_intersect_key($originalData, $this->_aliases);
 					}
+
 
 					//los que no tienen setter se meten directamente
 					$notSetter = array_diff_key($originalData, $this->_setters);
 
-					$this->_data = array_merge($this->_data, $notSetter);
-					//aseguramos los nuevos alias
-					$newkeys        = array_keys($this->_data);
-					$this->_aliases = array_merge(array_combine($newkeys, $newkeys), (array) $this->_aliases);
+					if ($notSetter) {
+						$this->_data = array_merge($this->_data, $notSetter);
+
+						//aseguramos los nuevos alias
+						$newkeys = array_keys($this->_data);
+
+						if ($this->_aliases) {
+							$this->_aliases = array_merge(array_combine($newkeys, $newkeys), (array) $this->_aliases);
+						} else {
+							$this->_aliases = array_combine($newkeys, $newkeys);
+						}
+					}
 
 					//si hay más, van por setter (no es necesario añadir alias, pues si tienen setter es que están definidos en la clase)
 					if (count($notSetter) < count($originalData)) {
@@ -468,7 +494,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	}
 
 	protected function treatOffsetArraysAsPseudoArrays($key, $x) {
-		$x = new EtuDev_PseudoArray_Object($x, self::PROPERTIES_LEVEL_ALL);
+		$x = new EtuDev_PseudoArray_Object($x);
 		$x->setFlag(EtuDev_PseudoArray_Object::OFFSET_ARRAYS_AS_PSEUDOARRAY);
 		$x->setIsWrapperOfArray(true);
 		$this->_set($key, $x);
