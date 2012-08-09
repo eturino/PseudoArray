@@ -152,7 +152,7 @@ class EtuDev_PseudoArray_Factory {
 				$active_levels = array();
 			} else {
 				// check attribute
-				if (preg_match('/@propertyalias[\s\t]+[a-zA-Z_0-9]+[\s\t]+[a-zA-Z_0-9]+/', $line, $matches)) {
+				if (preg_match('/@propertyalias[\s\t]+[$a-zA-Z_0-9]+[\s\t]+[$a-zA-Z_0-9]+/', $line, $matches)) {
 					foreach ($matches as $key => $m) {
 						$res              = trim(str_replace('@propertyalias', '', $m));
 						$res              = str_replace('$', '', $res);
@@ -162,9 +162,10 @@ class EtuDev_PseudoArray_Factory {
 					}
 				}
 				// check attribute
-				if (preg_match('/@propertyignored[\s\t]+[a-zA-Z_0-9]+/', $line, $matches)) {
+				if (preg_match('/@[propertyignored|propertyignore][\s\t]+[$a-zA-Z_0-9]+/', $line, $matches)) {
 					foreach ($matches as $key => $m) {
 						$res        = trim(str_replace('@propertyignored', '', $m));
+						$res        = str_replace('@propertyignored', '', $res);
 						$res        = str_replace('$', '', $res);
 						$res        = preg_replace('/[\s\t]+/', ' ', $res);
 						$res        = explode(' ', $res);

@@ -263,6 +263,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 
 		if ($originalData) {
 			try {
+
 				if ($originalData instanceof EtuDev_Interfaces_ToArrayAble) {
 					$originalData = $originalData->toArray();
 				}
@@ -693,6 +694,8 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	 * @return array
 	 */
 	public function toArray($level = null, $toArrayToArrayables = true) {
+//		var_dump('>>>>',get_called_class());
+
 		if (is_null($level)) {
 			$level = static::TO_ARRAY_LEVEL_DEFAULT ? : self::LEVEL_ALL;
 		}
@@ -728,19 +731,27 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 			foreach ($st as $k => $v) {
 				if ($v instanceof EtuDev_Interfaces_ToArrayAbleFull) {
 					/** @var $v EtuDev_Interfaces_ToArrayAbleFull */
+//					var_dump('>> OPTION (taF)' . $k . ': ' . get_class($v));
 					$o[$k] = $v->toArray($level, $toArrayToArrayables);
+//					var_dump('>> FIN OPTION (taF) ' . $k);
 				} elseif ($v instanceof EtuDev_Interfaces_ToArrayAble) {
 					/** @var $v EtuDev_Interfaces_ToArrayAble */
+//					var_dump('>> OPTION (taA) ' . $k . ': ' . get_class($v));
 					$o[$k] = $v->toArray();
+//					var_dump('>> FIN OPTION (taA) ' . $k);
 				} elseif (is_array($v)) {
 					$a = array();
 					foreach ($v as $vk => $vv) {
-						if ($v instanceof EtuDev_Interfaces_ToArrayAbleFull) {
+						if ($vv instanceof EtuDev_Interfaces_ToArrayAbleFull) {
 							/** @var $vv EtuDev_Interfaces_ToArrayAbleFull */
+//							var_dump('>> OPTION_AR (taF) ' . $k . '->' . $vk . ': ' . get_class($vv));
 							$a[$vk] = $vv->toArray($level, $toArrayToArrayables);
+//							var_dump('>> FIN OPTION_AR (taF) ' . $k . '->' . $vk);
 						} elseif ($vv instanceof EtuDev_Interfaces_ToArrayAble) {
 							/** @var $vv EtuDev_Interfaces_ToArrayAble */
+//							var_dump('>> OPTION_AR (taA) ' . $k . '->' . $vk . ': ' . get_class($vv));
 							$a[$vk] = $vv->toArray();
+//							var_dump('>> FIN OPTION_AR (taA) ' . $k . '->' . $vk);
 						} else {
 							$a[$vk] = $vv;
 						}
