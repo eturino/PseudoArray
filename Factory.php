@@ -24,11 +24,11 @@ class EtuDev_PseudoArray_Factory {
 		}
 
 		//load from cache
-//		$info = EtuDev_PseudoArray_Cache::getInstance()->get($class);
-//		if ($info) {
-//			static::$info[$class] = $info;
-//			return $info;
-//		}
+		$info = EtuDev_PseudoArray_Cache::getInstance()->get($class);
+		if ($info) {
+			static::$info[$class] = $info;
+			return $info;
+		}
 
 		$info = static::loadInfo($class);
 		if ($info) {
