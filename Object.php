@@ -43,30 +43,13 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	 */
 	const OFFSET_NORMAL = 0;
 
-
-	const PROPERTIES_LEVEL_DOCBLOCK   = 1;
-	const PROPERTIES_LEVEL_ATTRIBUTES = 2;
-	const PROPERTIES_LEVEL_DYNAMIC    = 4;
-	/**
-	 * PROPERTIES_LEVEL_DOCBLOCK and PROPERTIES_LEVEL_ATTRIBUTES
-	 */
-	const PROPERTIES_LEVEL_DEFINED = 3;
-
-	/**
-	 * PROPERTIES_LEVEL_DOCBLOCK and PROPERTIES_LEVEL_ATTRIBUTES and PROPERTIES_LEVEL_DYNAMIC
-	 */
-	const PROPERTIES_LEVEL_ALL = 7;
-
-	/**
-	 * to be redefined in children classes
-	 */
-	const DEFAULT_PROPERTIES_LEVEL = null;
-
-
 	protected $_position;
 
+	/**
+	 * @var bool if false it will ignore any parameter that is not defined in the docblocks
+	 */
+	protected $_allow_not_defined = true;
 
-	private $_properties_level_flag = EtuDev_PseudoArray_Object::PROPERTIES_LEVEL_ALL;
 
 	/** @var array precalculated properties */
 	protected $_properties_by_level = array();
@@ -179,26 +162,6 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 
 
 	/**
-	 * check if this EtuDev_PseudoArray_Object will only accept properties defined in the DocBlock
-	 * @return int
-	 */
-	public function _getPropertiesLevelFlag() {
-		return (array) $this->_properties_level_flag;
-	}
-
-	/**
-	 * sets the flag that says if this EtuDev_PseudoArray_Object will accept only properties defined in the DocBlock
-	 *
-	 * @param int $level_flag
-	 *
-	 * @return EtuDev_PseudoArray_Object
-	 */
-	public function _setPropertiesLevelFlag($level_flag) {
-		$this->_properties_level_flag = $level_flag;
-		return $this;
-	}
-
-	/**
 	 * setter para $_isWrapperOfArray
 	 *
 	 * @param bool $is
@@ -243,6 +206,10 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 	 *
 	 */
 	public function replaceWholeContainer(array $originalData) {
+		if (!$this->_allow_not_defined) {
+			$originalData = array_intersect_key($originalData, $this->_aliases);
+		}
+
 		$this->_data = $originalData;
 		if ($originalData) {
 			$newkeys        = array_keys($this->_data);
@@ -279,8 +246,13 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 						$originalData = $a;
 					}
 
+					if (!$this->_allow_not_defined) {
+						$originalData = array_intersect_key($originalData, $this->_aliases);
+					}
+
 					//los que no tienen setter se meten directamente
-					$notSetter   = array_diff_key($originalData, $this->_setters);
+					$notSetter = array_diff_key($originalData, $this->_setters);
+
 					$this->_data = array_merge($this->_data, $notSetter);
 					//aseguramos los nuevos alias
 					$newkeys        = array_keys($this->_data);
@@ -540,7 +512,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 			throw new Exception("Value invalid");
 		}
 
-		if ($atkey === '' || $atkey === null) {
+		if (($atkey === '' || $atkey === null) && $this->_allow_not_defined) {
 			$this->_data[] = $value;
 			end($this->_data);
 			$newKey = key($this->_data);
@@ -555,10 +527,15 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 			return $this->$setter($value);
 		}
 
-		$key                    = @$this->_aliases[$atkey] ? : $atkey; //por si no está definido ya
-		$this->_data[$key]      = $value;
-		$this->_aliases[$atkey] = $key; //por si fuera necesario almacenarlo (mejor directamente que mirar a ver si ya está)
-		return true;
+		if ($this->_allow_not_defined || $this->_aliases[$atkey]) {
+			$key                    = @$this->_aliases[$atkey] ? : $atkey; //por si no está definido ya
+			$this->_data[$key]      = $value;
+			$this->_aliases[$atkey] = $key; //por si fuera necesario almacenarlo (mejor directamente que mirar a ver si ya está)
+			return true;
+		} else {
+			return false;
+		}
+
 	}
 
 	final protected function _setDirectByDynamic($key, $value) {
@@ -731,27 +708,19 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 			foreach ($st as $k => $v) {
 				if ($v instanceof EtuDev_Interfaces_ToArrayAbleFull) {
 					/** @var $v EtuDev_Interfaces_ToArrayAbleFull */
-//					var_dump('>> OPTION (taF)' . $k . ': ' . get_class($v));
 					$o[$k] = $v->toArray($level, $toArrayToArrayables);
-//					var_dump('>> FIN OPTION (taF) ' . $k);
 				} elseif ($v instanceof EtuDev_Interfaces_ToArrayAble) {
 					/** @var $v EtuDev_Interfaces_ToArrayAble */
-//					var_dump('>> OPTION (taA) ' . $k . ': ' . get_class($v));
 					$o[$k] = $v->toArray();
-//					var_dump('>> FIN OPTION (taA) ' . $k);
 				} elseif (is_array($v)) {
 					$a = array();
 					foreach ($v as $vk => $vv) {
 						if ($vv instanceof EtuDev_Interfaces_ToArrayAbleFull) {
 							/** @var $vv EtuDev_Interfaces_ToArrayAbleFull */
-//							var_dump('>> OPTION_AR (taF) ' . $k . '->' . $vk . ': ' . get_class($vv));
 							$a[$vk] = $vv->toArray($level, $toArrayToArrayables);
-//							var_dump('>> FIN OPTION_AR (taF) ' . $k . '->' . $vk);
 						} elseif ($vv instanceof EtuDev_Interfaces_ToArrayAble) {
 							/** @var $vv EtuDev_Interfaces_ToArrayAble */
-//							var_dump('>> OPTION_AR (taA) ' . $k . '->' . $vk . ': ' . get_class($vv));
 							$a[$vk] = $vv->toArray();
-//							var_dump('>> FIN OPTION_AR (taA) ' . $k . '->' . $vk);
 						} else {
 							$a[$vk] = $vv;
 						}
@@ -765,6 +734,31 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 		} else {
 			return $st;
 		}
+	}
+
+	/**
+	 * @return bool if false it will ignore any parameter that is not defined in the docblocks
+	 */
+	public function isAllowNotDefined() {
+		return $this->_allow_not_defined;
+	}
+
+	/**
+	 * @param bool $v
+	 *
+	 * @return EtuDev_PseudoArray_Object
+	 */
+	public function setAllowNotDefined($v = true) {
+		$this->_allow_not_defined = (bool) $v;
+		return $this;
+	}
+
+	/**
+	 * @return EtuDev_PseudoArray_Object
+	 */
+	public function unsetAllowNotDefined() {
+		$this->_allow_not_defined = false;
+		return $this;
 	}
 
 	/**
