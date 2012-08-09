@@ -24,11 +24,11 @@ class EtuDev_PseudoArray_Factory {
 		}
 
 		//load from cache
-		$info = EtuDev_PseudoArray_Cache::getInstance()->get($class);
-		if ($info) {
-			static::$info[$class] = $info;
-			return $info;
-		}
+//		$info = EtuDev_PseudoArray_Cache::getInstance()->get($class);
+//		if ($info) {
+//			static::$info[$class] = $info;
+//			return $info;
+//		}
 
 		$info = static::loadInfo($class);
 		if ($info) {
@@ -156,18 +156,19 @@ class EtuDev_PseudoArray_Factory {
 					foreach ($matches as $key => $m) {
 						$res              = trim(str_replace('@propertyalias', '', $m));
 						$res              = str_replace('$', '', $res);
-						$res              = preg_replace('/[\s\t]+/', ' ', $res);
+						$res              = trim(preg_replace('/[\s\t]+/', ' ', $res));
 						$res              = explode(' ', $res);
 						$aliases[$res[0]] = $res[1];
 					}
 				}
+
 				// check attribute
-				if (preg_match('/@[propertyignored|propertyignore][\s\t]+[$a-zA-Z_0-9]+/', $line, $matches)) {
+				if (preg_match('/@propertyignore[d]?[\s\t]+[$a-zA-Z_0-9]+/', $line, $matches)) {
 					foreach ($matches as $key => $m) {
 						$res        = trim(str_replace('@propertyignored', '', $m));
-						$res        = str_replace('@propertyignored', '', $res);
+						$res        = str_replace('@propertyignore', '', $res);
 						$res        = str_replace('$', '', $res);
-						$res        = preg_replace('/[\s\t]+/', ' ', $res);
+						$res        = trim(preg_replace('/[\s\t]+/', ' ', $res));
 						$res        = explode(' ', $res);
 						$toIgnore[] = $res[0];
 					}
