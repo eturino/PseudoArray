@@ -54,7 +54,7 @@ class EtuDev_PseudoArray_Factory {
 		$setters = array();
 		$getters = array();
 		foreach ((array) $info['properties'] as $prop) {
-			$aliases = $info['aliases'] ? array_filter($info['aliases'], function($v) use ($prop) {
+			$aliases = $info['aliases'] ? array_filter($info['aliases'], function ($v) use ($prop) {
 				return $v == $prop;
 			}) : array();
 
@@ -108,17 +108,54 @@ class EtuDev_PseudoArray_Factory {
 		return $res;
 	}
 
+	/**
+	 * @param ReflectionClass $ref
+	 *
+	 * @return string
+	 */
 	static protected function getDocBlock($ref) {
-		$docblocks   = array();
-		$docblocks[] = $ref->getDocComment();
+		$docblocks = array();
+
+		$docblocks[] = static::calculateDocBlockOfSingleClassAndInterfaces($ref);
 
 		/** @var $ref ReflectionClass */
-		while (($ref = $ref->getParentClass()) && ($ref->getName() != __CLASS__)) {
-			$d = $ref->getDocComment();
+		while (($ref = $ref->getParentClass()) && ($ref->getName() != __CLASS__) && ($ref->getName() != 'EtuDev_PseudoArray_Object')) {
+			$d = static::calculateDocBlockOfSingleClassAndInterfaces($ref);
 			if ($d) {
 				$docblocks[] = $d;
 			}
 		}
+
+		$docblocks = array_reverse($docblocks);
+
+		return implode("\n", $docblocks);
+	}
+
+	/**
+	 * @param ReflectionClass $ref
+	 *
+	 * @return string
+	 */
+	static protected function calculateDocBlockOfSingleClassAndInterfaces($ref) {
+		$docblocks   = array();
+		$docblocks[] = $ref->getDocComment();
+
+		$a = $ref->getInterfaces();
+		foreach ($a as $int) {
+			$d = $int->getDocComment();
+			if ($d) {
+				$docblocks[] = $d;
+			}
+		}
+
+		$traits = $ref->getTraits();
+		foreach ($traits as $t) {
+			$d = static::calculateDocBlockOfSingleClassAndInterfaces($t);
+			if ($d) {
+				$docblocks[] = $d;
+			}
+		}
+
 
 		$docblocks = array_reverse($docblocks);
 
