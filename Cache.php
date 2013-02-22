@@ -21,7 +21,7 @@ class EtuDev_PseudoArray_Cache {
 	protected $enabled = true;
 
 	public function isEnabled() {
-		return $this->enabled && EtuDev_Cache_Driver_APC::getInstance()->isEnabled();
+		return $this->enabled && EtuDev_Cache_Engine_Fast::getInstance()->isEnabled();
 	}
 
 	public function enable() {
@@ -47,15 +47,15 @@ class EtuDev_PseudoArray_Cache {
 
 	public function write($k, $v, $time_to_live = 86400) {
 		$key = $this->completeKey($k);
-		return EtuDev_Cache_Driver_APC::getInstance()->set($key, $v, $time_to_live);
+		return EtuDev_Cache_Engine_Fast::getInstance()->set($key, $v, $time_to_live);
 	}
 
 	public function get($k) {
-		return EtuDev_Cache_Driver_APC::getInstance()->get($this->completeKey($k));
+		return EtuDev_Cache_Engine_Fast::getInstance()->get($this->completeKey($k));
 	}
 
 	public function deleteAll() {
-		return EtuDev_Cache_Driver_APC::deletePrefix($this->getPrefix());
+		return EtuDev_Cache_Engine_Fast::getInstance()->deleteAllPrefix($this->getPrefix());
 	}
 
 }
