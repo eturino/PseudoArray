@@ -148,11 +148,13 @@ class EtuDev_PseudoArray_Factory {
 			}
 		}
 
-		$traits = $ref->getTraits();
-		foreach ($traits as $t) {
-			$d = static::calculateDocBlockOfSingleClassAndInterfaces($t);
-			if ($d) {
-				$docblocks[] = $d;
+		if(method_exists($ref, 'getTraits')){
+			$traits = $ref->getTraits();
+			foreach ($traits as $t) {
+				$d = static::calculateDocBlockOfSingleClassAndInterfaces($t);
+				if ($d) {
+					$docblocks[] = $d;
+				}
 			}
 		}
 
