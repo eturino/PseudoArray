@@ -385,7 +385,7 @@ class EtuDev_PseudoArray_Object implements Iterator, ArrayAccess, SeekableIterat
 					}
 
 					//podemos quitar los que ya estén en el container (salvo null)
-					$data     = array_filter($this->_data, function($v) {
+					$data     = array_filter($this->_data, function ($v) {
 						return !is_null($v);
 					});
 					$not_data = array_diff_key($originalData, $data);
